@@ -1,3 +1,16 @@
 {
-  "extends": "next/core-web-vitals"
+  "extends": [
+    "next/core-web-vitals", 
+    "@rocketseat/eslint-config/next",
+    "prettier"
+  ],
+  "plugins": [
+    "prettier",
+    "simple-import-sort"
+  ],
+  "rules": {
+    "camelcase": "off",
+    "no-useless-constructor": "off",
+    "simple-import-sort/imports": "error"
+  }
 }
