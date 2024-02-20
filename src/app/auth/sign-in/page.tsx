@@ -1,7 +1,10 @@
 import { Metadata } from 'next'
 import Image from 'next/image'
+import { redirect } from 'next/navigation'
+import { AuthOptions, getServerSession } from 'next-auth'
 
-import BlackHoleImage from '@/assets/cartoon-black-hole-07.webp'
+import BlackHoleImage from '@/assets/cartoon-black-hole-06.webp'
+import { authOptions } from '@/lib/auth'
 
 import { SignInForm } from './components/sign-form'
 
@@ -9,7 +12,21 @@ export const metadata: Metadata = {
   title: 'Sign In',
 }
 
-export default function SignInPage() {
+interface SignInPageProps {
+  searchParams: {
+    callbackUrl?: string | null
+  }
+}
+
+export default async function SignInPage({ searchParams }: SignInPageProps) {
+  const session = await getServerSession(authOptions as AuthOptions)
+
+  if (session?.user) {
+    redirect('/driver/home')
+  }
+
+  const { callbackUrl } = searchParams
+
   return (
     <div className="min-w-screen grid min-h-screen grid-cols-6">
       <section className="col-span-4 flex min-h-full flex-col justify-between py-8 pl-8">
@@ -51,7 +68,7 @@ export default function SignInPage() {
             e explore seus arquivos.
           </p>
         </div>
-        <SignInForm />
+        <SignInForm callbackUrl={callbackUrl} />
       </section>
     </div>
   )

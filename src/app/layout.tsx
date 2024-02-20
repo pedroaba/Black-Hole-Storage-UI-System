@@ -4,6 +4,8 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import localFont from 'next/font/local'
 
+import { Toaster } from '@/components/ui/sonner'
+
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 const antaFont = localFont({
   src: './fonts/Anta-Regular.ttf',
@@ -56,6 +58,7 @@ export default function RootLayout({
       >
         {children}
       </body>
+      <Toaster closeButton theme="system" />
     </html>
   )
 }

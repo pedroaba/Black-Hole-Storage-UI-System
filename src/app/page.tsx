@@ -1,3 +1,5 @@
+import { redirect, RedirectType } from 'next/navigation'
+
 export default function Home() {
-  return <h1>Hello Black Hole</h1>
+  redirect('/auth/sign-in', RedirectType.replace)
 }

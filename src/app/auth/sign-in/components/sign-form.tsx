@@ -3,8 +3,11 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Eye, EyeOff } from 'lucide-react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { signIn } from 'next-auth/react'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import { z } from 'zod'
 
 import { Button } from '@/components/ui/button'
@@ -19,13 +22,29 @@ import {
 import { Input } from '@/components/ui/input'
 
 export const signInSchema = z.object({
-  email: z.string().email(),
-  password: z.string(),
+  email: z
+    .string({
+      required_error: 'É necessário que você entre com um email',
+    })
+    .email({
+      message: 'Entre com um email válido',
+    }),
+  password: z
+    .string({
+      required_error: 'Insira a sua senha',
+    })
+    .min(8, {
+      message: 'A senha precisa ter no mínimo 8 caracteres',
+    }),
 })
 
 export type SignInSchema = z.infer<typeof signInSchema>
 
-export function SignInForm() {
+export interface SignInFormProps {
+  callbackUrl?: string | null
+}
+
+export function SignInForm({ callbackUrl }: SignInFormProps) {
   const [showPassword, setShowPassword] = useState(false)
   const [hasFocusOnPasswordInput, setPasswordInputFocus] = useState(false)
 
@@ -33,8 +52,32 @@ export function SignInForm() {
     resolver: zodResolver(signInSchema),
   })
 
-  async function handleSignIn(data: SignInSchema) {
-    console.log(data)
+  const router = useRouter()
+
+  async function handleSignIn({ email, password }: SignInSchema) {
+    try {
+      const auth = await signIn('credentials', {
+        email,
+        password,
+        redirect: false,
+      })
+
+      if (auth?.error) {
+        return toast('Erro na Autenticação', {
+          description: `Aconteceu um erro na hora da autenticação: ${auth.error}`,
+        })
+      }
+
+      if (callbackUrl) {
+        return router.push(callbackUrl)
+      }
+
+      router.push('/driver/home')
+    } catch (e) {
+      return toast('Erro na Autenticação', {
+        description: 'Aconteceu um erro na hora da autenticação',
+      })
+    }
   }
 
   return (
